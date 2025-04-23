@@ -1,9 +1,10 @@
 package com.customer_service.customer_service.app.controller;
 
 
-import com.customer_service.customer_service.app.model.dto.CorporateRequest;
-import com.customer_service.customer_service.app.model.dto.CorporateResponse;
-import com.customer_service.customer_service.app.model.dto.SearchCorporateRequest;
+import com.customer_service.customer_service.app.model.dto.corporate.CorporateRequest;
+import com.customer_service.customer_service.app.model.dto.corporate.CorporateResponse;
+import com.customer_service.customer_service.app.model.dto.corporate.CorporateServiceRequest;
+import com.customer_service.customer_service.app.model.dto.corporate.SearchCorporateRequest;
 import com.customer_service.customer_service.app.services.CorporateService;
 import com.customer_service.customer_service.core.model.Permission;
 import com.customer_service.customer_service.core.model.RequestBodyModel;
@@ -68,5 +69,22 @@ public class CorporateController {
         ResponseBodyModel<List<CorporateResponse>> response = corporateService.searchCorporate(request);
         return ResponseEntity.ok(response);
     }
+
+    @Permission(menu = CORPORATE_MANAGEMENT, permission = CREATE)
+    @PostMapping(path = "/s/corporate/service",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseBodyModel<String>> addServiceCorporate(@Valid @RequestBody CorporateServiceRequest request) {
+        ResponseBodyModel<String> response = corporateService.addCorporateService(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Permission(menu = CORPORATE_MANAGEMENT, permission = DELETE)
+    @DeleteMapping(path = "/s/corporate/service/{corporateServiceId}",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResponseBodyModel<String>> addServiceCorporate(@PathVariable("corporateServiceId") String corporateServiceId) {
+        ResponseBodyModel<String> response = corporateService.removeCorporateService(corporateServiceId);
+        return ResponseEntity.ok(response);
+    }
+
 
 }

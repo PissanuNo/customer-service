@@ -2,12 +2,12 @@ package com.customer_service.customer_service.app.services.impl;
 
 import com.customer_service.customer_service.app.model.dbs.CorporateConfigModel;
 import com.customer_service.customer_service.app.model.dbs.CorporateModel;
-import com.customer_service.customer_service.app.model.dto.CorporateConfig;
-import com.customer_service.customer_service.app.model.dto.CorporateRequest;
-import com.customer_service.customer_service.app.model.dto.CorporateResponse;
-import com.customer_service.customer_service.app.model.dto.SearchCorporateRequest;
+import com.customer_service.customer_service.app.model.dbs.CorporateServiceModel;
+import com.customer_service.customer_service.app.model.dto.corporate.*;
 import com.customer_service.customer_service.app.repositories.CorporateConfigRepository;
 import com.customer_service.customer_service.app.repositories.CorporateRepository;
+import com.customer_service.customer_service.app.repositories.CorporateServiceRepository;
+import com.customer_service.customer_service.app.repositories.ServiceModuleRepository;
 import com.customer_service.customer_service.app.services.CorporateService;
 import com.customer_service.customer_service.app.services.UtilService;
 import com.customer_service.customer_service.app.services.client.AccountServiceClient;
@@ -44,6 +44,8 @@ public class CorporateServiceImpl implements CorporateService {
     private final UtilService utilService;
     private final AccountServiceClient accountServiceClient;
     private final CorporateConfigRepository corporateConfigRepository;
+    private final CorporateServiceRepository corporateServiceRepository;
+    private final ServiceModuleRepository serviceModuleRepository;
 
     @Transactional
     @Override
@@ -183,7 +185,7 @@ public class CorporateServiceImpl implements CorporateService {
             ResponseBodyModel<Boolean> result = accountServiceClient
                     .hasEmployeeInCorporate(List.of(corporateId));
             if (result.getObjectValue().equals(Boolean.TRUE)) {
-//                corporateRepository.deleteById(corporateId);
+                corporateRepository.deleteById(corporateId);
                 response.setOperationSuccess(SUCCESS_CODE, SUCCESS, null);
             } else {
                 response.setOperationError(ERROR_CODE_BUSINESS, ERROR, null);
@@ -220,15 +222,51 @@ public class CorporateServiceImpl implements CorporateService {
         return response;
     }
 
-    public ResponseBodyModel<String> addCorporateService(String corporateId, String serviceId){
+    @Transactional
+    @Override
+    public ResponseBodyModel<String> addCorporateService(CorporateServiceRequest request) {
         ResponseBodyModel<String> response = new ResponseBodyModel<>();
-        try{
-            //check corporate
-            //check service
-            //ass corporate service
+        try {
+            //check corporate and service
+            if (corporateRepository.existsById(request.getCorporateId())
+                    || serviceModuleRepository.existsById(request.getServiceId())) {
+                response.setOperationError(ERROR_CODE_DATA_NOT_FOUND, DATA_NOT_FOUND, null);
+                return response;
+            }
 
-        }catch (Exception ex){
+            if (corporateServiceRepository.existsByCorporateIdAndServiceId(request.getCorporateId(), request.getServiceId())) {
+                response.setOperationError(ERROR_CODE_DATA_NOT_FOUND, DATA_DUPLICATE, null);
+                return response;
+            }
+
+            //add corporate service
+            corporateServiceRepository.saveAndFlush(CorporateServiceModel.builder()
+                    .tranId(UUID.randomUUID().toString())
+                    .corporateId(request.getCorporateId())
+                    .serviceId(request.getServiceId())
+                    .build());
+
+            response.setOperationSuccess(SUCCESS_CODE, SUCCESS, null);
+        } catch (Exception ex) {
             log.error("Error adding corporate service", ex);
+            response.setOperationError(INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR_MSG, null);
+        }
+        return response;
+    }
+
+    @Transactional
+    @Override
+    public ResponseBodyModel<String> removeCorporateService(String corporateServiceId) {
+        ResponseBodyModel<String> response = new ResponseBodyModel<>();
+        try {
+            if (corporateServiceRepository.existsById(corporateServiceId)) {
+                corporateServiceRepository.deleteById(corporateServiceId);
+            } else {
+                response.setOperationError(ERROR_CODE_DATA_NOT_FOUND, DATA_NOT_FOUND, null);
+            }
+            response.setOperationSuccess(SUCCESS_CODE, SUCCESS, null);
+        } catch (Exception ex) {
+            log.error("Error removing corporate service", ex);
             response.setOperationError(INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR_MSG, null);
         }
         return response;

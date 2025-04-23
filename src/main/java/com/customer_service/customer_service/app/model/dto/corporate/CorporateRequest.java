@@ -1,5 +1,6 @@
-package com.customer_service.customer_service.app.model.dto;
+package com.customer_service.customer_service.app.model.dto.corporate;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,11 +10,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CorporateResponse {
+public class CorporateRequest {
     private String corporateId;
+
+    @NotBlank
     private String corporateNameEn;
+
+    @NotBlank
     private String corporateNameTh;
-    private String coporateParent;
+
+    private String corporateParent;
+
     private Integer hirencyLevel;
+
     private CorporateConfig corporateConfig;
+
+
 }

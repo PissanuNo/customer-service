@@ -1,8 +1,8 @@
 package com.customer_service.customer_service.app.services;
 
-import com.customer_service.customer_service.app.model.dto.DepartmentRequest;
-import com.customer_service.customer_service.app.model.dto.DepartmentResponse;
-import com.customer_service.customer_service.app.model.dto.SearchDepartmentRequest;
+import com.customer_service.customer_service.app.model.dto.department.DepartmentRequest;
+import com.customer_service.customer_service.app.model.dto.department.DepartmentResponse;
+import com.customer_service.customer_service.app.model.dto.department.SearchDepartmentRequest;
 import com.customer_service.customer_service.core.model.RequestBodyModel;
 import com.customer_service.customer_service.core.model.ResponseBodyModel;
 

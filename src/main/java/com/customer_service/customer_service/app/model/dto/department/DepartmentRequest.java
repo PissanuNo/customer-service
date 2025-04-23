@@ -1,4 +1,4 @@
-package com.customer_service.customer_service.app.model.dto;
+package com.customer_service.customer_service.app.model.dto.department;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
